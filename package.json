@@ -7,6 +7,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src --out-dir dist"
   },
+  "homepage": "https://github.com/jgkinnear/redux-entities",
+  "repository": {
+    "url": "git+https://github.com/jgkinnear/redux-entities.git",
+    "type": "git"
+  },
   "author": "Jason Kinnear",
   "license": "ISC",
   "devDependencies": {
