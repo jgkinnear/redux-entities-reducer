@@ -2,7 +2,7 @@
   "name": "redux-entities-reducer",
   "version": "0.0.3",
   "description": "Normalized entities for redux",
-  "main": "./src/index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "babel src --plugins transform-object-rest-spread --out-dir dist"
