@@ -19,28 +19,26 @@ import {
  * @returns {*}
  */
 const buildEntityAction = (action, entityKey) => {
-
-	return Object.assign({},
-		action,
-		{
-			entities: action.entities[entityKey],
-			entityKey
-		}
-	);
-
+	return Object.assign({}, action, {
+		entities: action.entities[entityKey],
+		entityKey,
+	});
 };
 
 /**
- * Generate Entities Reducer - Accepts the initial state and single entity overrides, and returns the reducer
+ * Generate Entities Reducer - Accepts the initial state and single entity overrides, and returns the reducer. You can
+ * also provide the default entity reducer to use
  *
  * @param initialState
  * @param entityReducers
+ * @param defaultEntityReducer
  * @returns {*}
  */
-const EntitiesReducer = (initialState = {}, entityReducers = {}) => (state = initialState, action) => {
-
+const EntitiesReducer = (initialState = {}, entityReducers = {}, defaultEntityReducer = entity()) => (
+	state = initialState,
+	action,
+) => {
 	switch (action.type) {
-
 		/**
 		 * Standard Entity handlers
 		 */
@@ -49,14 +47,16 @@ const EntitiesReducer = (initialState = {}, entityReducers = {}) => (state = ini
 		case REPLACE_ENTITIES:
 		case RESET_ENTITIES:
 		case UPDATE_ENTITIES:
-
 			// NOTE: this was reduced to an un-readable form to avoid eslint complaints.
 			// Looping through the supplied entities and calling the entity.js reducer, which handles
 			// merging, replacing, resetting and removing entities from state
-			return Object.assign({}, Object.keys(action.entities).reduce((eObj, key) => {
-				let reducer = entityReducers[key] || entity();
-				return eObj[key] = reducer(eObj, buildEntityAction(action, key));
-			}, Object.assign({}, state)));
+			return Object.assign(
+				{},
+				Object.keys(action.entities).reduce((eObj, key) => {
+					let reducer = entityReducers[key] || defaultEntityReducer;
+					return (eObj[key] = reducer(eObj, buildEntityAction(action, key)));
+				}, Object.assign({}, state)),
+			);
 		default:
 			return state;
 	}

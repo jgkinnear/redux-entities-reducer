@@ -35,11 +35,13 @@ var buildEntityAction = function buildEntityAction(action, entityKey) {
  *
  * @param initialState
  * @param entityReducers
+ * @param defaultEntityReducer
  * @returns {*}
  */
 var EntitiesReducer = function EntitiesReducer() {
 	var initialState = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 	var entityReducers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+	var defaultEntityReducer = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : (0, _EntityReducer2.default)();
 	return function () {
 		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
 		var action = arguments[1];
@@ -60,7 +62,7 @@ var EntitiesReducer = function EntitiesReducer() {
 				// Looping through the supplied entities and calling the entity.js reducer, which handles
 				// merging, replacing, resetting and removing entities from state
 				return Object.assign({}, Object.keys(action.entities).reduce(function (eObj, key) {
-					var reducer = entityReducers[key] || (0, _EntityReducer2.default)();
+					var reducer = entityReducers[key] || defaultEntityReducer;
 					return eObj[key] = reducer(eObj, buildEntityAction(action, key));
 				}, Object.assign({}, state)));
 			default:

@@ -1,11 +1,9 @@
-
 import CreateEntityReducer from './EntitiesReducer';
-import {UPDATE_ENTITIES} from './EntitiesActionTypes';
+import { UPDATE_ENTITIES } from './EntitiesActionTypes';
 
 let reducer;
 
 describe('Reducer::Entities', () => {
-
 	beforeEach(() => {
 		reducer = CreateEntityReducer();
 	});
@@ -15,29 +13,28 @@ describe('Reducer::Entities', () => {
 	});
 
 	describe('update()', () => {
-
 		it('should add entities when supplied', () => {
-			let entities = {
+			const entities = {
 				users: {
 					1: {
 						id: 1,
-						name: 'jason'
-					}
-				}
+						name: 'user 1',
+					},
+				},
 			};
-			let result = reducer({users: {}}, {type: UPDATE_ENTITIES, entities: entities});
+			const result = reducer({ users: {} }, { type: UPDATE_ENTITIES, entities: entities });
 			expect(result).toMatchObject(entities);
 		});
 
-		it('Should update existing entity properties, while keeping ones not passed in', () => {
-
+		it('should update existing entity properties, while keeping ones not passed in', () => {
 			let initialState = {
 				users: {
 					1: {
 						id: 1,
-						name: 'Jason'
-					}
-				}
+						name: 'User 1',
+						age: 20,
+					},
+				},
 			};
 
 			let action = {
@@ -45,31 +42,30 @@ describe('Reducer::Entities', () => {
 				entities: {
 					users: {
 						1: {
-							name: 'Lily'
-						}
-					}
-				}
+							name: 'User 2',
+						},
+					},
+				},
 			};
 
 			expect(reducer(initialState, action)).toMatchObject({
 				users: {
 					1: {
-						name: 'Lily'
-					}
-				}
+						name: 'User 2',
+						age: 20,
+					},
+				},
 			});
-
 		});
 
-		it('Should add new properties, while keeping ones not passed in', () => {
-
+		it('should add new properties, while keeping ones not passed in', () => {
 			let initialState = {
 				users: {
 					1: {
 						id: 1,
-						name: 'Jason'
-					}
-				}
+						name: 'User 1',
+					},
+				},
 			};
 
 			let action = {
@@ -77,22 +73,21 @@ describe('Reducer::Entities', () => {
 				entities: {
 					users: {
 						1: {
-							last_name: 'Kinnear'
-						}
-					}
-				}
+							last_name: 'User 1 Last Name',
+						},
+					},
+				},
 			};
 
 			expect(reducer(initialState, action)).toMatchObject({
 				users: {
 					1: {
 						id: 1,
-						name: 'Jason',
-						last_name: 'Kinnear'
-					}
-				}
+						name: 'User 1',
+						last_name: 'User 1 Last Name',
+					},
+				},
 			});
-
 		});
 	});
 });

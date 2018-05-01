@@ -1,0 +1,5 @@
+useTabs: true # Always use tabs
+printWidth: 120 # Wrap code at 120 characters
+singleQuote: true # Use single quotes for variables (doesn't affect HTML attributes)
+trailingComma: "all" # Enforce trailing commas for all objects and arrays
+arrowParens: "always" # Always include parenthesis for arrow functions (including single parameters)
