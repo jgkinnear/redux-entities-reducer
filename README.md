@@ -1,13 +1,11 @@
 # Redux Entities Reducer
-Redux Entities Reducer provides a toolkit for creating, using and maintaining the client side store of entities. 
-
-It is simply a collection of popular libraries with a light layer of abstraction to allow ease of use. 
+Redux Entities Reducer provides a toolkit for creating, using and maintaining the client side store of entities.  
 
 Redux Entities Reducer provides:
- - A Reducer which can be used as a central store for entities. 
- - An actions creators which can update, merge, reset, replace and delete entities.
+ - A Reducer which can be used as a central slice in your redux store for entities. 
+ - An suite of action creators which provide the ability to update, merge, reset, replace and remove entities.
  - A Controller to easily register and define relationships for entities.
- - Helper methods to normalize and denormalize entities.
+ - An Entity class which provides exposes functions to normalize and denormalize entity data.
  
 ## Installation
 To install the latest, stable version:
@@ -21,32 +19,79 @@ yarn add redux-entities-reducer
 
 This assumes you are using NPM or Yarn as your package manager.
 
+## Quick Start
+
+
 ## Getting Started
 There are two main classes you can use:
  1. The Reducer - A reducer to manage client side store of entities.
  2. The Controller - A registry for entities, and a suit of methods to assist in using them
  
 ### The Reducer
-The reducer handles the 5 main actions types
+The reducer handles 5 actions types
  - MERGE_ENTITIES 
  - UPDATE_ENTITIES 
  - RESET_ENTITIES 
  - REPLACE_ENTITIES 
  - REMOVE_ENTITIES 
 
-It is not concerned with how they were created, so if you don't opt into the Controller, or you are already using normalizr, then you can create the reducer and start using the action creators.
+The reducer is not concerned with how the entities were generated, so if you choose not to use the Controller, or you 
+are already using normalizr, then you can create the reducer and start dispatching your normalized entities via the action
+creators
 
-The shape of an action is:
+An example of the shape of an action:
 ```javascript
 const mergeAction = {
 	type: 'MERGE_ENTITIES',
 	entities: entitiesOutputFromNormalizr,
 }
 ```
-There is a range of action creators to assist with creating these action objects
+There is a range of action creators to assist with creating these action objects.
 ```javascript
 import {mergeEntities, updateEntities, resetEntities, replaceEntities, removeEntities} from 'redux-entities-reducer';
 ```
+
+To create the reducer, you can use the following
+```javascript
+import {createReducer, createEntityReducer} from 'redux-entities-reducer';
+createReducer({
+    books: createEntityReducer(['authors']),
+    author: customAuthorReducer, 
+})
+```
+
+#### Entity Reducer
+The Entities reducer manages grouping the entities together, however the real work is done in the EntityReducer (singular).
+The slice of state the EntitiesReducer manages is as follows:
+```json
+{
+  books: {},
+  authors: {},
+  users: {},
+}
+```
+
+Every entity has its own Entity Reducer which handles how that entity is integrated into the store. You can generate a 
+reducer by using the `createEntityReducer(relationshipKeys = [])` or create your own reducer, which handles all 5 of the
+action types.
+
+If you are using the `EntityController` (see below) you can generate this configuration
+```javascript
+import {createController, hasMany} from 'redux-entities-reducer';
+
+const Controller = createController();
+Controller.register('books', {authors: hasMany('authors')});
+Controller.register('authors');
+
+const reducer = Controller.createReducer();
+
+// The above is the same as doing
+createReducer({
+    books: createEntityReducer(['authors']),
+    authors: createEntityReducer(),
+})
+```
+
 #### Example
 ```javascript
 
@@ -54,53 +99,35 @@ import {createReducer, mergeEntities} from 'redux-entities-reducer';
 
 // Generate a reducer (With redux combineReducers)
 export default combineReducers({
-	entities: createReducer({users: {}, books: {}}),
+	entities: createReducer({books: createEntityReducer(['authors']), authors: createEntityReducer()}),
 	... // Other reducers
 });
 
 // Dispatch action to merge entities into the store
 dispatch(mergeEntities({
-    users: {
+    authors: {
         1: {
             id: 1,
             name: 'Person 1',
             age: 30,
-            books: [1]
         },
         
     },
     books: {
         1: {
             id: 1,
-            title: 'Ready Player One'
+            title: 'Ready Player One',
+            authors: [1],
         }
     }
 }));
 ```
 
-#### Data with Relationships
-You must tell the reducer which entities there are, as well as what keys map to other entities:
-```javascript
-import {createReducer, createEntityReducer} from 'redux-entities-reducer';
-
-// createReducer(reducers, defaultReducerCreator);
-
-createReducer({
-    books: createEntityReducer(),
-    authors: null, // Use the default
-});
-
-// If you are using the controller, you can generate the reducers for each entity registered
-createReducer(Controller.allReducers());
-
-```
-
-
 #### Advanced Reducer
 For each entity provided, an `EntityReducer` will be used. By default, it will handle the 5 actions.
 
 ### The Controller
-The controller provides a seamless way of setting up relationships, creating actions and normalizing/denormalizin data. 
+The controller provides a seamless way of setting up relationships, creating actions and normalizing/denormalizing data. 
 
 For each entity, it simply provides various methods to assist in interacting with entities.
 #### Creating the Entities Controller
