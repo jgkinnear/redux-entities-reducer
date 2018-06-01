@@ -26,6 +26,15 @@ export const hasMany = (key) => {
  * Entities Management Controller
  */
 export default class EntitiesController {
+
+	/**
+	 * Bind register to the class. Using this instead of arrow function props as it will allow class methods to override
+	 * the method.
+	 */
+	constructor() {
+		this.register = this.register.bind(this);
+	}
+
 	/**
 	 * Indicated whether the EntityController has been initialized. The initialize process defines all normalizr relationships.
 	 * We can't do this on the fly, as normliazr required all schemas to be defined before create relationships if you
@@ -64,7 +73,7 @@ export default class EntitiesController {
 	 * @param relations
 	 * @param options
 	 */
-	register = (key, relations = {}, options = {}) => {
+	register(key, relations = {}, options = {}) {
 		let instance;
 
 		if (key.prototype instanceof Entity) {

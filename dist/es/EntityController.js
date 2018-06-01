@@ -7,6 +7,8 @@ exports.hasMany = exports.hasOne = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _normalizr = require('normalizr');
 
 var _Entity = require('./Entity');
@@ -43,197 +45,212 @@ var hasMany = exports.hasMany = function hasMany(key) {
  * Entities Management Controller
  */
 
-var EntitiesController = function EntitiesController() {
-	var _this = this;
+var EntitiesController = function () {
 
-	_classCallCheck(this, EntitiesController);
+	/**
+  * Bind register to the class. Using this instead of arrow function props as it will allow class methods to override
+  * the method.
+  */
+	function EntitiesController() {
+		var _this = this;
 
-	this.isInitialized = false;
-	this._entityConfig = {};
-	this._schemas = {};
-	this.entities = {};
+		_classCallCheck(this, EntitiesController);
 
-	this.register = function (key) {
-		var relations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-		var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+		this.isInitialized = false;
+		this._entityConfig = {};
+		this._schemas = {};
+		this.entities = {};
 
-		var instance = void 0;
-
-		if (key.prototype instanceof _Entity2.default) {
-			instance = new key({
-				context: _this
-			});
-			_this.entities[instance.key] = instance;
-		} else {
-			instance = new _Entity2.default({ key: key, relationships: relations, processStrategy: options.processStrategy, reducer: options.reducer });
-			_this.entities[instance.key] = instance;
-		}
-
-		_this._entityConfig[instance.key] = {
-			key: instance.key,
-			relations: instance.relationships,
-			options: {
-				processStrategy: instance.processStrategy
-			}
+		this.initEntity = function (entityConfig) {
+			_this._schemas[entityConfig.key] = new _normalizr.schema.Entity(entityConfig.key, {}, entityConfig.options);
 		};
-	};
 
-	this.initEntity = function (entityConfig) {
-		_this._schemas[entityConfig.key] = new _normalizr.schema.Entity(entityConfig.key, {}, entityConfig.options);
-	};
+		this.getSchema = function (key) {
+			return _this._schemas[key];
+		};
 
-	this.getSchema = function (key) {
-		return _this._schemas[key];
-	};
+		this.allReducers = function () {
+			var reducers = {};
 
-	this.allReducers = function () {
-		var reducers = {};
+			Object.keys(_this.entities).forEach(function (entityKey) {
+				var entity = _this.entities[entityKey];
+				reducers[entity.key] = entity.reducer();
+			});
 
-		Object.keys(_this.entities).forEach(function (entityKey) {
-			var entity = _this.entities[entityKey];
-			reducers[entity.key] = entity.reducer();
-		});
+			return reducers;
+		};
 
-		return reducers;
-	};
+		this.initRelations = function (entity) {
+			var relations = {};
+			var entityConfigRelations = _this._entityConfig[entity.key].relations;
+			Object.keys(entityConfigRelations).forEach(function (relationKey) {
+				relations[relationKey] = _typeof(entityConfigRelations[relationKey]) === 'object' ? new _normalizr.schema.Array(_this.getSchema(entityConfigRelations[relationKey][0])) : _this.getSchema(entityConfigRelations[relationKey]);
+			});
+			_this.getSchema(entity.key).define(relations);
+		};
 
-	this.initRelations = function (entity) {
-		var relations = {};
-		var entityConfigRelations = _this._entityConfig[entity.key].relations;
-		Object.keys(entityConfigRelations).forEach(function (relationKey) {
-			relations[relationKey] = _typeof(entityConfigRelations[relationKey]) === 'object' ? new _normalizr.schema.Array(_this.getSchema(entityConfigRelations[relationKey][0])) : _this.getSchema(entityConfigRelations[relationKey]);
-		});
-		_this.getSchema(entity.key).define(relations);
-	};
+		this.normalize = function (key) {
+			var items = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-	this.normalize = function (key) {
-		var items = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+			return (0, _normalizr.normalize)(items, new _normalizr.schema.Array(_this.getSchema(key)));
+		};
 
-		return (0, _normalizr.normalize)(items, new _normalizr.schema.Array(_this.getSchema(key)));
-	};
+		this.denormalize = function (key) {
+			var entities = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-	this.denormalize = function (key) {
-		var entities = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+			var keys = Object.keys(entities[key]);
+			return (0, _normalizr.denormalize)(keys, [_this.getSchema(key)], entities);
+		};
 
-		var keys = Object.keys(entities[key]);
-		return (0, _normalizr.denormalize)(keys, [_this.getSchema(key)], entities);
-	};
+		this.init = function () {
+			if (_this.isInitialized) {
+				return _this;
+			}
 
-	this.init = function () {
-		if (_this.isInitialized) {
+			Object.keys(_this._entityConfig).forEach(function (key) {
+				return _this.initEntity(_this._entityConfig[key]);
+			});
+			Object.keys(_this._schemas).forEach(function (key) {
+				return _this.initRelations(_this.getSchema(key));
+			});
+			_this.isInitialized = true;
 			return _this;
+		};
+
+		this.createReducer = function () {
+			_this.init();
+			return (0, _index.createReducer)(_this.allReducers());
+		};
+
+		this.register = this.register.bind(this);
+	}
+
+	/**
+  * Indicated whether the EntityController has been initialized. The initialize process defines all normalizr relationships.
+  * We can't do this on the fly, as normliazr required all schemas to be defined before create relationships if you
+  * need to support circular relationships
+  * @type {boolean}
+  */
+
+
+	/**
+  * Entity Configuration - Used to store the raw configuration of each entity
+  *
+  * @type {{}}
+  * @private
+  */
+
+
+	/**
+  * Stores each entity schema and relationships
+  *
+  * @type {{}}
+  * @private
+  */
+
+
+	/**
+  * All registered instances of the Entity model, keyed by the entity key
+  *
+  * @type {{}}
+  */
+
+
+	_createClass(EntitiesController, [{
+		key: 'register',
+
+
+		/**
+   * Register an entity to the controller
+   *
+   * @param key
+   * @param relations
+   * @param options
+   */
+		value: function register(key) {
+			var relations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+			var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+			var instance = void 0;
+
+			if (key.prototype instanceof _Entity2.default) {
+				instance = new key({
+					context: this
+				});
+				this.entities[instance.key] = instance;
+			} else {
+				instance = new _Entity2.default({ key: key, relationships: relations, processStrategy: options.processStrategy, reducer: options.reducer });
+				this.entities[instance.key] = instance;
+			}
+
+			this._entityConfig[instance.key] = {
+				key: instance.key,
+				relations: instance.relationships,
+				options: {
+					processStrategy: instance.processStrategy
+				}
+			};
 		}
 
-		Object.keys(_this._entityConfig).forEach(function (key) {
-			return _this.initEntity(_this._entityConfig[key]);
-		});
-		Object.keys(_this._schemas).forEach(function (key) {
-			return _this.initRelations(_this.getSchema(key));
-		});
-		_this.isInitialized = true;
-		return _this;
-	};
-
-	this.createReducer = function () {
-		_this.init();
-		return (0, _index.createReducer)(_this.allReducers());
-	};
-}
-/**
- * Indicated whether the EntityController has been initialized. The initialize process defines all normalizr relationships.
- * We can't do this on the fly, as normliazr required all schemas to be defined before create relationships if you
- * need to support circular relationships
- * @type {boolean}
- */
+		/**
+   * Initialize the entity
+   *
+   * @param entityConfig
+   */
 
 
-/**
- * Entity Configuration - Used to store the raw configuration of each entity
- *
- * @type {{}}
- * @private
- */
+		/**
+   * Get the registered normalizr schema
+   *
+   * @param key
+   * @returns {*}
+   */
 
 
-/**
- * Stores each entity schema and relationships
- *
- * @type {{}}
- * @private
- */
+		/**
+   * Build an object of all reducers
+   *
+   * @returns {{}}
+   */
 
 
-/**
- * All registered instances of the Entity model, keyed by the entity key
- *
- * @type {{}}
- */
+		/**
+   * Initialize the relationships. This must happen after all entity schemas have been initialized
+   *
+   * @param entity
+   */
 
 
-/**
- * Register an entity to the controller
- *
- * @param key
- * @param relations
- * @param options
- */
+		/**
+   * Normalize a given array of entities of the same type
+   *
+   * @param key
+   * @param items
+   */
 
 
-/**
- * Initialize the entity
- *
- * @param entityConfig
- */
+		/**
+   * Denormalize the entities in normalized format for a particular schema
+   *
+   * @param key
+   * @param entities
+   */
 
 
-/**
- * Get the registered normalizr schema
- *
- * @param key
- * @returns {*}
- */
+		/**
+   * Initialize the registered entities
+   */
 
 
-/**
- * Build an object of all reducers
- *
- * @returns {{}}
- */
+		/**
+   * A wrapper for createReducer, to create the reducer based on what has been registered to the controller
+   *
+   * @returns {EntitiesReducer}
+   */
 
+	}]);
 
-/**
- * Initialize the relationships. This must happen after all entity schemas have been initialized
- *
- * @param entity
- */
-
-
-/**
- * Normalize a given array of entities of the same type
- *
- * @param key
- * @param items
- */
-
-
-/**
- * Denormalize the entities in normalized format for a particular schema
- *
- * @param key
- * @param entities
- */
-
-
-/**
- * Initialize the registered entities
- */
-
-
-/**
- * A wrapper for createReducer, to create the reducer based on what has been registered to the controller
- *
- * @returns {EntitiesReducer}
- */
-;
+	return EntitiesController;
+}();
 
 exports.default = EntitiesController;
