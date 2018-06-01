@@ -90,13 +90,13 @@ var replaceObjectInArraySlice = function replaceObjectInArraySlice() {
 			return object;
 		}
 
-		// Return the updated object
+		// Return the a new object with the updated properties
 		return _extends({}, object, payload);
 	});
 };
 
 /**
- * Creates an action
+ * Creates an action in a consistent format
  *
  * @param type
  * @param payload

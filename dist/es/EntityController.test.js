@@ -21,23 +21,26 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 describe('buildEntity', function () {
-
 	var Entities = void 0;
 
 	var book1 = {
-		id: 1, name: 'Book1'
+		id: 1,
+		name: 'Book1'
 	};
 
 	var book2 = {
-		id: 2, name: 'Book2'
+		id: 2,
+		name: 'Book2'
 	};
 
 	var author1 = {
-		id: 1, name: 'Author1'
+		id: 1,
+		name: 'Author1'
 	};
 
 	var author2 = {
-		id: 2, name: 'Author2'
+		id: 2,
+		name: 'Author2'
 	};
 
 	beforeEach(function () {
@@ -122,10 +125,12 @@ describe('buildEntity', function () {
 	it('should denormalize entities', function () {
 		Entities.register('book');
 		Entities.init();
-		var result = Entities.denormalize('book', { book: {
+		var result = Entities.denormalize('book', {
+			book: {
 				1: book1,
 				2: book2
-			} });
+			}
+		});
 		expect(result).toEqual([book1, book2]);
 	});
 

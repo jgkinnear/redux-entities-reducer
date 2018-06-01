@@ -1,7 +1,7 @@
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+	value: true
 });
 exports.RESET_ENTITIES = exports.REMOVE_ENTITIES = exports.REPLACE_ENTITIES = exports.UPDATE_ENTITIES = exports.MERGE_ENTITIES = exports.removeEntities = exports.resetEntities = exports.replaceEntities = exports.mergeEntities = exports.updateEntities = exports.Entity = exports.hasMany = exports.hasOne = exports.createEntityReducer = exports.createReducer = exports.createController = undefined;
 
@@ -34,7 +34,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {EntitiesController}
  */
 var createController = function createController(options) {
-  return new _EntityController2.default(options);
+	return new _EntityController2.default(options);
 };
 
 /**
@@ -44,13 +44,12 @@ var createController = function createController(options) {
  * @returns {EntitiesReducer}
  */
 var createReducer = function createReducer(entityReducers, defaultEntityReducer) {
+	var initialState = {};
+	Object.keys(entityReducers || {}).forEach(function (reducerKey) {
+		initialState[reducerKey] = {};
+	});
 
-  var initialState = {};
-  Object.keys(entityReducers || {}).forEach(function (reducerKey) {
-    initialState[reducerKey] = {};
-  });
-
-  return new _EntitiesReducer2.default(initialState, entityReducers, defaultEntityReducer);
+	return new _EntitiesReducer2.default(initialState, entityReducers, defaultEntityReducer);
 };
 
 /**
@@ -61,7 +60,7 @@ var createReducer = function createReducer(entityReducers, defaultEntityReducer)
  * @returns {function(*=, *)}
  */
 var createEntityReducer = function createEntityReducer(relations, types) {
-  return (0, _EntityReducer2.default)(relations, types);
+	return (0, _EntityReducer2.default)(relations, types);
 };
 
 exports.createController = createController;

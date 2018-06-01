@@ -57,7 +57,6 @@ var EntitiesController = function EntitiesController() {
 		var relations = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 		var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-
 		var instance = void 0;
 
 		if (key.prototype instanceof _Entity2.default) {
@@ -88,7 +87,6 @@ var EntitiesController = function EntitiesController() {
 	};
 
 	this.allReducers = function () {
-
 		var reducers = {};
 
 		Object.keys(_this.entities).forEach(function (entityKey) {
@@ -136,11 +134,18 @@ var EntitiesController = function EntitiesController() {
 		return _this;
 	};
 
-	this.createReducer = function (defaultEntityReducer) {
+	this.createReducer = function () {
 		_this.init();
-		return (0, _index.createReducer)(_this.allReducers(defaultEntityReducer));
+		return (0, _index.createReducer)(_this.allReducers());
 	};
 }
+/**
+ * Indicated whether the EntityController has been initialized. The initialize process defines all normalizr relationships.
+ * We can't do this on the fly, as normliazr required all schemas to be defined before create relationships if you
+ * need to support circular relationships
+ * @type {boolean}
+ */
+
 
 /**
  * Entity Configuration - Used to store the raw configuration of each entity
@@ -155,6 +160,13 @@ var EntitiesController = function EntitiesController() {
  *
  * @type {{}}
  * @private
+ */
+
+
+/**
+ * All registered instances of the Entity model, keyed by the entity key
+ *
+ * @type {{}}
  */
 
 
@@ -220,7 +232,6 @@ var EntitiesController = function EntitiesController() {
 /**
  * A wrapper for createReducer, to create the reducer based on what has been registered to the controller
  *
- * @param defaultEntityReducer
  * @returns {EntitiesReducer}
  */
 ;

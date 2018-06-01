@@ -23,7 +23,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @returns {*}
  */
 var buildEntityAction = function buildEntityAction(action, entityKey) {
-
 	return Object.assign({}, action, {
 		entities: action.entities[entityKey],
 		entityKey: entityKey
@@ -31,7 +30,8 @@ var buildEntityAction = function buildEntityAction(action, entityKey) {
 };
 
 /**
- * Generate Entities Reducer - Accepts the initial state and single entity overrides, and returns the reducer
+ * Generate Entities Reducer - Accepts the initial state and single entity overrides, and returns the reducer. You can
+ * also provide the default entity reducer to use
  *
  * @param initialState
  * @param entityReducers
@@ -46,9 +46,7 @@ var EntitiesReducer = function EntitiesReducer() {
 		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
 		var action = arguments[1];
 
-
 		switch (action.type) {
-
 			/**
     * Standard Entity handlers
     */
@@ -57,7 +55,6 @@ var EntitiesReducer = function EntitiesReducer() {
 			case _EntitiesActionTypes.REPLACE_ENTITIES:
 			case _EntitiesActionTypes.RESET_ENTITIES:
 			case _EntitiesActionTypes.UPDATE_ENTITIES:
-
 				// NOTE: this was reduced to an un-readable form to avoid eslint complaints.
 				// Looping through the supplied entities and calling the entity.js reducer, which handles
 				// merging, replacing, resetting and removing entities from state

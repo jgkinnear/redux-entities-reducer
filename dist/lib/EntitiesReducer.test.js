@@ -11,7 +11,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var reducer = void 0;
 
 describe('Reducer::Entities', function () {
-
 	beforeEach(function () {
 		reducer = (0, _EntitiesReducer2.default)();
 	});
@@ -21,13 +20,12 @@ describe('Reducer::Entities', function () {
 	});
 
 	describe('update()', function () {
-
 		it('should add entities when supplied', function () {
 			var entities = {
 				users: {
 					1: {
 						id: 1,
-						name: 'jason'
+						name: 'user 1'
 					}
 				}
 			};
@@ -35,13 +33,13 @@ describe('Reducer::Entities', function () {
 			expect(result).toMatchObject(entities);
 		});
 
-		it('Should update existing entity properties, while keeping ones not passed in', function () {
-
+		it('should update existing entity properties, while keeping ones not passed in', function () {
 			var initialState = {
 				users: {
 					1: {
 						id: 1,
-						name: 'Jason'
+						name: 'User 1',
+						age: 20
 					}
 				}
 			};
@@ -51,7 +49,7 @@ describe('Reducer::Entities', function () {
 				entities: {
 					users: {
 						1: {
-							name: 'Lily'
+							name: 'User 2'
 						}
 					}
 				}
@@ -60,19 +58,19 @@ describe('Reducer::Entities', function () {
 			expect(reducer(initialState, action)).toMatchObject({
 				users: {
 					1: {
-						name: 'Lily'
+						name: 'User 2',
+						age: 20
 					}
 				}
 			});
 		});
 
-		it('Should add new properties, while keeping ones not passed in', function () {
-
+		it('should add new properties, while keeping ones not passed in', function () {
 			var initialState = {
 				users: {
 					1: {
 						id: 1,
-						name: 'Jason'
+						name: 'User 1'
 					}
 				}
 			};
@@ -82,7 +80,7 @@ describe('Reducer::Entities', function () {
 				entities: {
 					users: {
 						1: {
-							last_name: 'Kinnear'
+							last_name: 'User 1 Last Name'
 						}
 					}
 				}
@@ -92,8 +90,8 @@ describe('Reducer::Entities', function () {
 				users: {
 					1: {
 						id: 1,
-						name: 'Jason',
-						last_name: 'Kinnear'
+						name: 'User 1',
+						last_name: 'User 1 Last Name'
 					}
 				}
 			});

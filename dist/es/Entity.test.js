@@ -11,8 +11,7 @@ var _EntityController2 = _interopRequireDefault(_EntityController);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 describe('Entity', function () {
-
-	it('should create a new instance with the appropriate properties copies', function () {
+	it('should create a new instance with the appropriate properties copied', function () {
 		var context = new _EntityController2.default();
 		var result = new _Entity2.default({
 			context: context,

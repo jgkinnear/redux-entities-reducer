@@ -78,7 +78,7 @@ function Entity(options) {
 		return (0, _EntityReducer2.default)(Object.keys(_this.relationships), _this.types);
 	};
 
-	var copyProps = ['context', 'key', 'relationships', 'processStrategy'];
+	var copyProps = ['context', 'key', 'relationships', 'processStrategy', 'reducer'];
 	copyProps.forEach(function (prop) {
 		if (options[prop] !== undefined) {
 			_this[prop] = options[prop];
@@ -104,7 +104,6 @@ function Entity(options) {
 /**
  * The relationship definitions
  */
-
 
 /**
  * The Key in which the entity is stored under. This is the key within the redux store, as well the key for

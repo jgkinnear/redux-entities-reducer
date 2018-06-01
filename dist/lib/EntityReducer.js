@@ -288,7 +288,6 @@ var entity = function entity() {
 	var relations = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
 	var types = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [_EntitiesActionTypes.MERGE_ENTITIES, _EntitiesActionTypes.REMOVE_ENTITIES, _EntitiesActionTypes.REPLACE_ENTITIES, _EntitiesActionTypes.RESET_ENTITIES, _EntitiesActionTypes.UPDATE_ENTITIES];
 
-
 	// Validate Types
 	if (types.length !== 5) {
 		throw new Error('Entity reducers required 5 types [Reset, Replace, Merge, Remove, and Update]');
@@ -298,7 +297,6 @@ var entity = function entity() {
 	return function () {
 		var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
 		var action = arguments[1];
-
 
 		if (!action.type) {
 			return state;
@@ -325,7 +323,6 @@ var entity = function entity() {
 
 
 		switch (action.type) {
-
 			/**
     * Reset
     *
