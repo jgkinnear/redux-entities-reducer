@@ -65,7 +65,7 @@ var EntitiesController = function EntitiesController() {
 			});
 			_this.entities[instance.key] = instance;
 		} else {
-			instance = new _Entity2.default({ key: key, relationships: relations, processStrategy: options.processStrategy });
+			instance = new _Entity2.default({ key: key, relationships: relations, processStrategy: options.processStrategy, reducer: options.reducer });
 			_this.entities[instance.key] = instance;
 		}
 
