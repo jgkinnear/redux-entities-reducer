@@ -43,7 +43,7 @@ export default class Entity {
 	 * @param options
 	 */
 	constructor(options) {
-		const copyProps = ['context', 'key', 'relationships', 'processStrategy'];
+		const copyProps = ['context', 'key', 'relationships', 'processStrategy', 'reducer'];
 		copyProps.forEach((prop) => {
 			if (options[prop] !== undefined) {
 				this[prop] = options[prop];
