@@ -42,7 +42,8 @@ export default class Entity {
 	 *
 	 * @param options
 	 */
-	constructor(options) {
+	constructor(options = {}) {
+		this.reducer = this.reducer.bind(this);
 		const copyProps = ['context', 'key', 'relationships', 'processStrategy', 'reducer'];
 		copyProps.forEach((prop) => {
 			if (options[prop] !== undefined) {
@@ -88,7 +89,7 @@ export default class Entity {
 	 *
 	 * @returns {function(*=, *)}
 	 */
-	reducer = () => {
-		return EntityReducer(Object.keys(this.relationships), this.types);
+	reducer() {
+		return EntityReducer(Object.keys(this.relationships || {}), this.types);
 	};
 }

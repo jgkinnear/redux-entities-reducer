@@ -16,4 +16,18 @@ describe('Entity', () => {
 			authors: 'authors',
 		});
 	});
+
+	it('should allow a new reducer to be defined', () => {
+
+		class Test extends Entity {
+			reducer() {
+				return 'override';
+			}
+		}
+
+		const A = new Test();
+
+		expect(A.reducer()).toBe('override');
+
+	})
 });
