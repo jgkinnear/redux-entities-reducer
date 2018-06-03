@@ -63,8 +63,11 @@ var merge = function merge() {
 		relations.forEach(function (relationKey) {
 			// Ensure that a relationship exists in both the old and the new before merging
 			if (entity[relationKey] && originalEntity[relationKey]) {
-				// Merge/concat the two relationships together, and make the list of ID's unique
-				entity[relationKey] = makeUniqueArray(originalEntity[relationKey].concat(entity[relationKey]));
+
+				// If the two entities are an array, then merge/concat the two relationships together, and make the list of ID's unique
+				if (originalEntity[relationKey] instanceof Array && entity[relationKey] instanceof Array) {
+					entity[relationKey] = makeUniqueArray(originalEntity[relationKey].concat(entity[relationKey]));
+				}
 			}
 		});
 
