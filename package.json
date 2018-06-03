@@ -1,6 +1,6 @@
 {
   "name": "redux-entities-reducer",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Normalized entities for redux",
   "main": "./dist/lib/index.js",
   "module": "./dist/es/index.js",
