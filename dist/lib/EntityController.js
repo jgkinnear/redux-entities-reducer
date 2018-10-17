@@ -179,7 +179,7 @@ var EntitiesController = function () {
 				});
 				this.entities[instance.key] = instance;
 			} else {
-				instance = new _Entity2.default({ key: key, relationships: relations, processStrategy: options.processStrategy, reducer: options.reducer });
+				instance = new _Entity2.default({ context: this, key: key, relationships: relations, processStrategy: options.processStrategy, reducer: options.reducer });
 				this.entities[instance.key] = instance;
 			}
 
