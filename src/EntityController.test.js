@@ -116,6 +116,22 @@ describe('buildEntity', () => {
 		expect(result).toEqual([book1, book2]);
 	});
 
+	it('should denormalize filtered entities', () => {
+		Entities.register('book');
+		Entities.init();
+		const result = Entities.denormalize(
+			'book',
+			{
+				book: {
+					1: book1,
+					2: book2,
+				},
+			},
+			[2],
+		);
+		expect(result).toEqual([book2]);
+	});
+
 	it('should attach an instance of an Entity to the controller', () => {
 		class Book extends Entity {
 			key = 'books';
