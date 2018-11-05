@@ -162,9 +162,10 @@ export default class EntitiesController {
 	 *
 	 * @param key
 	 * @param entities
+	 * @param filters
 	 */
-	denormalize = (key, entities = {}) => {
-		let keys = Object.keys(entities[key]);
+	denormalize = (key, entities = {}, filters = null) => {
+		const keys = Array.isArray(filters) ? filters : Object.keys(entities[key]);
 		return denormalize(keys, [this.getSchema(key)], entities);
 	};
 

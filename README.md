@@ -163,6 +163,10 @@ const books = Controller.getEntity('books');
 books.normalize(apiData);
 books.denormalize(apiData);
 
+Controller.normalize('books', data).entities;
+Controller.denormalize('books', state.entities);
+Controller.denormalize('books', state.entities, [1, 2, 3]);
+
 // Normalize data, then create an action to merge
 books.merge(denormalizedData);
 ```
