@@ -56,6 +56,12 @@ describe('buildEntity', function () {
 		});
 	});
 
+	it('should get the entity when requested', function () {
+		Entities.register('book');
+		var entity = Entities.getEntity('book');
+		expect(entity).toBeInstanceOf(_Entity3.default);
+	});
+
 	it('should create schemas when the Entities system is initialized', function () {
 		Entities.register('book');
 		Entities.init();
@@ -66,6 +72,21 @@ describe('buildEntity', function () {
 		Entities.register('book');
 		Entities.init();
 		var result = Entities.normalize('book', [book1, book2]);
+		expect(result).toEqual({
+			entities: {
+				book: {
+					1: book1,
+					2: book2
+				}
+			},
+			result: [1, 2]
+		});
+	});
+
+	it('should normalize an array of entities directly via the Entity', function () {
+		Entities.register('book');
+		Entities.init();
+		var result = Entities.getEntity('book').normalize([book1, book2]);
 		expect(result).toEqual({
 			entities: {
 				book: {
@@ -132,6 +153,18 @@ describe('buildEntity', function () {
 			}
 		});
 		expect(result).toEqual([book1, book2]);
+	});
+
+	it('should denormalize filtered entities', function () {
+		Entities.register('book');
+		Entities.init();
+		var result = Entities.denormalize('book', {
+			book: {
+				1: book1,
+				2: book2
+			}
+		}, [2]);
+		expect(result).toEqual([book2]);
 	});
 
 	it('should attach an instance of an Entity to the controller', function () {

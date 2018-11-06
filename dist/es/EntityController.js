@@ -80,6 +80,10 @@ var EntitiesController = function () {
 			return reducers;
 		};
 
+		this.getEntity = function (key) {
+			return _this.entities[key];
+		};
+
 		this.initRelations = function (entity) {
 			var relations = {};
 			var entityConfigRelations = _this._entityConfig[entity.key].relations;
@@ -97,8 +101,9 @@ var EntitiesController = function () {
 
 		this.denormalize = function (key) {
 			var entities = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+			var filters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-			var keys = Object.keys(entities[key]);
+			var keys = Array.isArray(filters) ? filters : Object.keys(entities[key]);
 			return (0, _normalizr.denormalize)(keys, [_this.getSchema(key)], entities);
 		};
 
@@ -234,6 +239,7 @@ var EntitiesController = function () {
    *
    * @param key
    * @param entities
+   * @param filters
    */
 
 

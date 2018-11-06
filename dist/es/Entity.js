@@ -113,7 +113,8 @@ var Entity = function () {
 
 
 	/**
-  * Normalize and Denormalize method maps
+  * Normalize and Denormalize method maps. Uses the context to perform the actions so that is has the other
+  * entities for relationships
   */
 
 
