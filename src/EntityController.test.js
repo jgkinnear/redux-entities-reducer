@@ -38,6 +38,12 @@ describe('buildEntity', () => {
 		});
 	});
 
+	it('should get the entity when requested', () => {
+		Entities.register('book');
+		const entity = Entities.getEntity('book');
+		expect(entity).toBeInstanceOf(Entity);
+	});
+
 	it('should create schemas when the Entities system is initialized', () => {
 		Entities.register('book');
 		Entities.init();
@@ -48,6 +54,21 @@ describe('buildEntity', () => {
 		Entities.register('book');
 		Entities.init();
 		const result = Entities.normalize('book', [book1, book2]);
+		expect(result).toEqual({
+			entities: {
+				book: {
+					1: book1,
+					2: book2,
+				},
+			},
+			result: [1, 2],
+		});
+	});
+
+	it('should normalize an array of entities directly via the Entity', () => {
+		Entities.register('book');
+		Entities.init();
+		const result = Entities.getEntity('book').normalize([book1, book2]);
 		expect(result).toEqual({
 			entities: {
 				book: {

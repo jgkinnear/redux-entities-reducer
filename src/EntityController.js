@@ -130,6 +130,10 @@ export default class EntitiesController {
 		return reducers;
 	};
 
+	getEntity = (key) => {
+		return this.entities[key];
+	};
+
 	/**
 	 * Initialize the relationships. This must happen after all entity schemas have been initialized
 	 *

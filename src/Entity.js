@@ -62,7 +62,8 @@ export default class Entity {
 	};
 
 	/**
-	 * Normalize and Denormalize method maps
+	 * Normalize and Denormalize method maps. Uses the context to perform the actions so that is has the other
+	 * entities for relationships
 	 */
 	normalize = (data) => this.context.normalize(this.key, data);
 	denormalize = (data) => this.context.denormalize(this.key, data);
