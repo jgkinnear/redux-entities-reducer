@@ -1,4 +1,5 @@
 import { schema, denormalize, normalize } from 'normalizr';
+import { memoize } from 'underscore';
 import Entity from './Entity';
 import { createReducer } from './index';
 
@@ -91,6 +92,7 @@ export default class EntitiesController {
 			relations: instance.relationships,
 			options: {
 				processStrategy: instance.processStrategy,
+				memoize: Boolean(options.memoize),
 			},
 		};
 	};
@@ -152,6 +154,35 @@ export default class EntitiesController {
 	};
 
 	/**
+	 * Denormalize the entities in normalized format for a particular schema
+	 *
+	 * @param key
+	 * @param entities
+	 * @param filters
+	 */
+	denormalizeEntity = (key, entities = {}, filters = null) => {
+		const keys = Array.isArray(filters) ? filters : Object.keys(entities[key]);
+		return denormalize(keys, [this.getSchema(key)], entities);
+	};
+
+	/**
+	 * Custom hasher for serializing the denormalisation arguments
+	 */
+	memoizeDenormalizedEntitiesSerializer = (key, ...rest) => key + JSON.stringify(...rest);
+
+	/**
+	 * Memoized version of the denormalize method
+	 */
+	memoizedDenormalizeEntity = memoize(this.denormalizeEntity, this.memoizeDenormalizedEntitiesSerializer);
+
+	/**
+	 * Memoize the denormalize function if the option is set for the entity otherwise call the base method directly
+	 */
+	denormalize = (key, ...rest) => {
+		return this._entityConfig[key].options.memoize ? this.memoizedDenormalizeEntity( key,...rest) : this.denormalizeEntity( key,...rest);
+	};
+
+	/**
 	 * Normalize a given array of entities of the same type
 	 *
 	 * @param key
@@ -159,18 +190,6 @@ export default class EntitiesController {
 	 */
 	normalize = (key, items = []) => {
 		return normalize(items, new schema.Array(this.getSchema(key)));
-	};
-
-	/**
-	 * Denormalize the entities in normalized format for a particular schema
-	 *
-	 * @param key
-	 * @param entities
-	 * @param filters
-	 */
-	denormalize = (key, entities = {}, filters = null) => {
-		const keys = Array.isArray(filters) ? filters : Object.keys(entities[key]);
-		return denormalize(keys, [this.getSchema(key)], entities);
 	};
 
 	/**
