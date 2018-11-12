@@ -31,10 +31,12 @@ describe('buildEntity', () => {
 
 	it('should add entity config keys', () => {
 		Entities.register('book');
-		expect(Entities._entityConfig.book).toEqual({
+		expect(Entities._entityConfig.book).toMatchObject({
 			key: 'book',
 			relations: {},
-			options: {},
+			options: {
+				memoize: false,
+			},
 		});
 	});
 
@@ -151,6 +153,75 @@ describe('buildEntity', () => {
 			[2],
 		);
 		expect(result).toEqual([book2]);
+	});
+
+	it('should not memoize denormalize entities', () => {
+		Entities.register('book');
+		Entities.init();
+		const result = Entities.denormalize('book', {
+			book: {
+				1: book1,
+				2: book2,
+			},
+		});
+		const result2 = Entities.denormalize('book', {
+			book: {
+				1: book1,
+				2: book2,
+			},
+		});
+		expect(result).not.toBe(result2);
+	});
+
+	it('should memoize denormalize entities', () => {
+		Entities.register('book', {}, { memoize: true });
+		Entities.init();
+		const result = Entities.denormalize('book', {
+			book: {
+				1: book1,
+			},
+		});
+		const result2 = Entities.denormalize('book', {
+			book: {
+				1: book1,
+			},
+		});
+		expect(result).toBe(result2);
+	});
+
+	it('should not memoize denormalize entities with setting enabled', () => {
+		Entities.register('book', {}, { memoize: true });
+		Entities.init();
+		const result = Entities.denormalize('book', {
+			book: {
+				1: book1,
+				2: book2,
+			},
+		});
+		const result2 = Entities.denormalize('book', {
+			book: {
+				1: book1,
+				2: book2,
+			},
+		}, [2]);
+		expect(result).not.toBe(result2);
+	});
+
+	it('should not memoize denormalize entities with setting enabled & filters', () => {
+		Entities.register('book', {}, { memoize: true });
+		Entities.init();
+		const result = Entities.denormalize('book', {
+			book: {
+				1: book1,
+			},
+		});
+		const result2 = Entities.denormalize('book', {
+			book: {
+				1: book1,
+				2: book2,
+			},
+		});
+		expect(result).not.toBe(result2);
 	});
 
 	it('should attach an instance of an Entity to the controller', () => {
