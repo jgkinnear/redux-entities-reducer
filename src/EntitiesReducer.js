@@ -50,13 +50,12 @@ const EntitiesReducer = (initialState = {}, entityReducers = {}, defaultEntityRe
 			// NOTE: this was reduced to an un-readable form to avoid eslint complaints.
 			// Looping through the supplied entities and calling the entity.js reducer, which handles
 			// merging, replacing, resetting and removing entities from state
-			return Object.assign(
-				{},
-				Object.keys(action.entities).reduce((eObj, key) => {
-					let reducer = entityReducers[key] || defaultEntityReducer;
-					return (eObj[key] = reducer(eObj, buildEntityAction(action, key)));
-				}, Object.assign({}, state)),
-			);
+			Object.keys(action.entities).forEach((key) => {
+				let reducer = entityReducers[key] || defaultEntityReducer;
+				state = reducer(state, buildEntityAction(action, key));
+			});
+
+			return state;
 		default:
 			return state;
 	}
