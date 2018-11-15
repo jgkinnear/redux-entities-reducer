@@ -1,3 +1,5 @@
+import { schema } from 'normalizr';
+
 import { MERGE_ENTITIES, UPDATE_ENTITIES } from './EntitiesActionTypes';
 import {
 	stripDeepCompare,
@@ -6,7 +8,28 @@ import {
 	updateEntities,
 	removeObjectInArraySlice,
 	replaceObjectInArraySlice,
+	getSchemaRelations,
+	buildEntitySchema
 } from './EntityActions';
+
+// Setup relationships
+const Book = new schema.Entity('books');
+const Library = new schema.Entity('libraries');
+const Author = new schema.Entity('authors');
+
+Book.define({
+	library: Library,
+	authors: Author,
+});
+
+Library.define({
+	books: [Book]
+});
+
+Author.define({
+	books: [Book]
+});
+
 export const STRIP_DEEP_COMPARE = {
 	//	CASES
 	COMPLETELY_SAME_DATA: {
@@ -392,5 +415,87 @@ describe('replaceObjectInArraySlice()', () => {
 		];
 
 		expect(replaceObjectInArraySlice(replace, obj)).toEqual(results);
+	});
+});
+
+describe('relationshipSelectorHelpers::getSchemaRelations', () => {
+	it('should build a tree with all relationship keys', () => {
+		let result = getSchemaRelations(Book);
+		expect(result).toEqual(expect.arrayContaining(['authors', 'books', 'libraries']));
+		expect(result.length).toBe(3);
+	});
+});
+
+describe('relationshipSelectorHelpers::buildEntitySchema', () => {
+
+	it('should build a memoized function', () => {
+		expect(typeof buildEntitySchema(Book)).toBe('function');
+	});
+
+	it('should extract the correct key and value pairs from a entity tree when the result of the function is called', () => {
+
+		let getBookEntities = buildEntitySchema(Book);
+		let entities = {
+			books: {},
+			people: {},
+			authors: {},
+			libraries: {},
+		};
+
+		let result = getBookEntities(entities);
+		expect(result).toMatchObject({
+			books: {},
+			authors: {},
+			libraries: {},
+		});
+	});
+
+	it('should memoize the result until values in the entity have changed', () => {
+
+		let getBookEntities = buildEntitySchema(Book);
+		let entities = {
+			people: {
+				1: {},
+			},
+			books: {
+				1: {
+					author: 1,
+					library: 1,
+				}
+			},
+			authors: {
+				1: {
+					books: [1]
+				},
+			},
+			libraries: {
+				1: {
+					books: [1]
+				},
+			},
+		};
+
+		let result1 = getBookEntities(entities);
+		let result2 = getBookEntities(entities);
+		expect(result1).toEqual(result2);
+
+		// Change people, which should still stay the same
+		entities.people = {};
+		let result3 = getBookEntities(entities);
+		expect(result1).toEqual(result3);
+
+		// Change the entities object, but keep the values of the relationship keys the same
+		entities = {
+			authors: entities.authors,
+			books: entities.books,
+			libraries: entities.libraries,
+		};
+		let result4 = getBookEntities(entities);
+		expect(result1 === result4).toBe(true);
+
+		// Change authors and the results should no longer be the same
+		entities = {};
+		let result5 = getBookEntities(entities);
+		expect(result1 === result5).toBe(false);
 	});
 });

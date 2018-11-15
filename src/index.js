@@ -2,7 +2,7 @@ import EntitiesReducer from './EntitiesReducer';
 import EntityReducer from './EntityReducer';
 import Entity from './Entity';
 import EntityController, { hasOne, hasMany } from './EntityController';
-import { updateEntities, mergeEntities, replaceEntities, resetEntities, removeEntities } from './EntityActions';
+import { updateEntities, mergeEntities, replaceEntities, resetEntities, removeEntities,	deepCompareUpdateEntities, deepCompareMergeEntities } from './EntityActions';
 import {
 	MERGE_ENTITIES,
 	UPDATE_ENTITIES,
@@ -54,6 +54,8 @@ export {
 	hasOne,
 	hasMany, // Relationship types
 	Entity, // Entity Class used for complex extension
+	deepCompareUpdateEntities, 
+	deepCompareMergeEntities,
 	updateEntities,
 	mergeEntities,
 	replaceEntities,
