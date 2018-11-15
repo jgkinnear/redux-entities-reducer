@@ -1,3 +1,7 @@
+import isEqual from 'lodash/isEqual';
+import { schema } from 'normalizr';
+import { createSelector } from 'reselect';
+
 import {
 	MERGE_ENTITIES,
 	REMOVE_ENTITIES,
@@ -5,8 +9,6 @@ import {
 	RESET_ENTITIES,
 	UPDATE_ENTITIES,
 } from './EntitiesActionTypes';
-
-import { isEqual } from 'underscore';
 
 /**
  * Strip entities with a deep compare
