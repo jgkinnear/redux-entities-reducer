@@ -9,7 +9,13 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _isEqual = require('lodash/isEqual');
+
+var _isEqual2 = _interopRequireDefault(_isEqual);
+
 var _EntitiesActionTypes = require('./EntitiesActionTypes');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -52,6 +58,7 @@ var merge = function merge() {
 		var originalEntity = state[entityKey][entityId] || actionEntity; // Entity in state
 
 		// If the old entities requested_at is after the new action entity, then don't use the action entity
+		// TODO: Make this entity defined. Will require this function having knowledge of an Entity or EntityController instance though.
 		if (isEntityOld(actionEntity, originalEntity)) {
 			return acc;
 		}
@@ -75,6 +82,12 @@ var merge = function merge() {
 
 		return acc;
 	}, {});
+
+	// Compare if there are differences between the existing and the new entities to be merged in
+	if ((0, _isEqual2.default)(state[entityKey], mergedEntities)) {
+		// If there are no differences, return what we have so that we don't need to update state with a new entities object
+		return state;
+	}
 
 	// Return our entities with our merged in entries
 	return _extends({}, state, _defineProperty({}, entityKey, _extends({}, state[entityKey], mergedEntities)));
@@ -345,7 +358,7 @@ var entity = function entity() {
 			/**
     * Merge
     *
-    * Merges the given entities with the current set. This utlises the passed in relation keys and will concat where required
+    * Merges the given entities with the current set. This utilises the passed in relation keys and will concat where required
     */
 			case MERGE:
 				return merge(state, action.entityKey, action.entities, relations);

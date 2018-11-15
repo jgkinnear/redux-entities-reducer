@@ -23,16 +23,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 describe('buildEntity', function () {
 	var Entities = void 0;
 
-	var book1 = {
-		id: 1,
-		name: 'Book1'
-	};
-
-	var book2 = {
-		id: 2,
-		name: 'Book2'
-	};
-
 	var author1 = {
 		id: 1,
 		name: 'Author1'
@@ -41,6 +31,18 @@ describe('buildEntity', function () {
 	var author2 = {
 		id: 2,
 		name: 'Author2'
+	};
+
+	var book1 = {
+		id: 1,
+		name: 'Book1',
+		author: author1
+	};
+
+	var book2 = {
+		id: 2,
+		name: 'Book2',
+		author: author2
 	};
 
 	beforeEach(function () {
