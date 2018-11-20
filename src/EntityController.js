@@ -83,7 +83,7 @@ export default class EntitiesController {
 			});
 			this.entities[instance.key] = instance;
 		} else {
-			instance = new Entity({ context: this, key, relationships: relations, processStrategy: options.processStrategy, reducer: options.reducer, });
+			instance = new Entity({ idAttribute: options.idAttribute || 'id', context: this, key, relationships: relations, processStrategy: options.processStrategy, reducer: options.reducer, });
 			this.entities[instance.key] = instance;
 		}
 
@@ -91,6 +91,7 @@ export default class EntitiesController {
 			key: instance.key,
 			relations: instance.relationships,
 			options: {
+				idAttribute: instance.idAttribute,
 				processStrategy: instance.processStrategy,
 			},
 		};

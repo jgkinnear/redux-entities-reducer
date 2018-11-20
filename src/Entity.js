@@ -36,6 +36,11 @@ export default class Entity {
 	processStrategy = undefined;
 
 	/**
+	 * The attribute to be used to uniquely identify the entity
+	 */
+	idAttribute = 'id';
+
+	/**
 	 * The type of actions the entity can handle.
 	 * TODO: Currently this order is important as it maps to the EntityReducer. This structure should be changed to be
 	 *       more explicit
@@ -51,7 +56,7 @@ export default class Entity {
 	constructor(options = {}) {
 		this.reducer = this.reducer.bind(this);
 
-		const copyProps = ['context', 'key', 'relationships', 'processStrategy', 'reducer'];
+		const copyProps = ['idAttribute', 'context', 'key', 'relationships', 'processStrategy', 'reducer'];
 		copyProps.forEach((prop) => {
 			if (options[prop] !== undefined) {
 				this[prop] = options[prop];
