@@ -28,17 +28,17 @@ var Entity = function () {
 
 
 	/**
-  * A function to process incoming entities
+  * The attribute to be used to uniquely identify the entity
   */
 
 
 	/**
-  * The relationship definitions
+  * Function to return the schema for the entity based on the provided entities
   */
 
+
 	/**
-  * The Key in which the entity is stored under. This is the key within the redux store, as well the key for
-  * relationship references
+  * The Entity Controller to provide context for the Entity
   */
 	function Entity() {
 		var _this = this;
@@ -52,6 +52,7 @@ var Entity = function () {
 		this.relationships = undefined;
 		this.entitySchema = undefined;
 		this.processStrategy = undefined;
+		this.idAttribute = 'id';
 		this.types = [_EntitiesActionTypes.MERGE_ENTITIES, _EntitiesActionTypes.REMOVE_ENTITIES, _EntitiesActionTypes.REPLACE_ENTITIES, _EntitiesActionTypes.RESET_ENTITIES, _EntitiesActionTypes.UPDATE_ENTITIES];
 
 		this.generateEntitySchema = function () {
@@ -96,7 +97,7 @@ var Entity = function () {
 
 		this.reducer = this.reducer.bind(this);
 
-		var copyProps = ['context', 'key', 'relationships', 'processStrategy', 'reducer'];
+		var copyProps = ['idAttribute', 'context', 'key', 'relationships', 'processStrategy', 'reducer'];
 		copyProps.forEach(function (prop) {
 			if (options[prop] !== undefined) {
 				_this[prop] = options[prop];
@@ -118,12 +119,17 @@ var Entity = function () {
 
 
 	/**
-  * Function to return the schema for the entity based on the provided entities
+  * A function to process incoming entities
   */
 
 
 	/**
-  * The Entity Controller to provide context for the Entity
+  * The relationship definitions
+  */
+
+	/**
+  * The Key in which the entity is stored under. This is the key within the redux store, as well the key for
+  * relationship references
   */
 
 

@@ -54,7 +54,10 @@ describe('buildEntity', function () {
 		expect(Entities._entityConfig.book).toEqual({
 			key: 'book',
 			relations: {},
-			options: {}
+			options: {
+				idAttribute: 'id',
+				processStrategy: undefined
+			}
 		});
 	});
 
@@ -73,6 +76,32 @@ describe('buildEntity', function () {
 	it('should normalize an array of entities', function () {
 		Entities.register('book');
 		Entities.init();
+		var result = Entities.normalize('book', [book1, book2]);
+		expect(result).toEqual({
+			entities: {
+				book: {
+					1: book1,
+					2: book2
+				}
+			},
+			result: [1, 2]
+		});
+	});
+
+	it('should normalize entities that use a different idAttribute', function () {
+
+		Entities.register('book', {}, { idAttribute: 'bookId' });
+		Entities.init();
+		var book1 = {
+			bookId: 1,
+			title: 'Book1'
+		};
+
+		var book2 = {
+			bookId: 2,
+			title: 'Book2'
+		};
+
 		var result = Entities.normalize('book', [book1, book2]);
 		expect(result).toEqual({
 			entities: {
