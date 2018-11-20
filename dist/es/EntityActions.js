@@ -3,13 +3,21 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.removeEntities = exports.replaceObjectInArraySlice = exports.removeObjectInArraySlice = exports.resetEntities = exports.replaceEntities = exports.updateEntities = exports.mergeEntities = exports.createAction = exports.stripDeepCompare = exports.deepCompareMergeEntities = exports.deepCompareUpdateEntities = undefined;
+exports.buildEntitySchema = exports.getSchemaRelations = exports.removeEntities = exports.replaceObjectInArraySlice = exports.removeObjectInArraySlice = exports.resetEntities = exports.replaceEntities = exports.updateEntities = exports.mergeEntities = exports.createAction = exports.stripDeepCompare = exports.deepCompareMergeEntities = exports.deepCompareUpdateEntities = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
+var _isEqual = require('lodash/isEqual');
+
+var _isEqual2 = _interopRequireDefault(_isEqual);
+
+var _normalizr = require('normalizr');
+
+var _reselect = require('reselect');
+
 var _EntitiesActionTypes = require('./EntitiesActionTypes');
 
-var _underscore = require('underscore');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Strip entities with a deep compare
@@ -36,7 +44,7 @@ var stripDeepCompare = function stripDeepCompare(normalizedData, currentState) {
 			// If the requested_at were different, we couldn't deep compare
 			var newRequestedAt = newEntity.requested_at;
 			newEntity.requested_at = currentEntity && currentEntity.requested_at ? currentEntity.requested_at : newEntity.requested_at;
-			if (!(0, _underscore.isEqual)(newEntity, currentEntity)) {
+			if (!(0, _isEqual2.default)(newEntity, currentEntity)) {
 				if (!changed[entityKey]) {
 					changed[entityKey] = {};
 				}
@@ -162,6 +170,72 @@ var deepCompareUpdateEntities = function deepCompareUpdateEntities(entities) {
 	};
 };
 
+/**
+ * Build a schema tree of a given entity schema. You can pass through a Entity or Array Schema
+ *
+ * @param entitySchema
+ * @param keys
+ * @param assessed
+ * @returns {Array}
+ */
+var getSchemaRelations = function getSchemaRelations(entitySchema) {
+	var keys = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+	var assessed = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+	if (entitySchema.constructor.name === 'ArraySchema' || entitySchema instanceof _normalizr.schema.Array) {
+		return getSchemaRelations(entitySchema.schema, keys, assessed);
+	} else if (entitySchema instanceof Array && entitySchema.length > 0) {
+		return getSchemaRelations(entitySchema[0], keys, assessed);
+	}
+
+	if (assessed.indexOf(entitySchema) !== -1) {
+		return keys;
+	}
+
+	if (entitySchema.schema) {
+		if (entitySchema._key && keys.indexOf(entitySchema._key) === -1) {
+			keys.push(entitySchema._key);
+			assessed.push(entitySchema);
+		}
+
+		Object.keys(entitySchema.schema).forEach(function (schemaKey) {
+			keys = getSchemaRelations(entitySchema.schema[schemaKey], keys, assessed);
+		});
+	}
+
+	return keys;
+};
+
+/**
+ * Build a memoized function that extracts keys from an entities slice
+ *
+ * @param scheme
+ * @returns {*}
+ */
+var buildEntitySchema = function buildEntitySchema(scheme) {
+	var keys = getSchemaRelations(scheme);
+	var selectorFunctions = keys.reduce(function (acc, key) {
+		acc.push(function (entities) {
+			return entities[key];
+		});
+
+		return acc;
+	}, []);
+
+	return (0, _reselect.createSelector)(selectorFunctions, function () {
+		for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+			args[_key] = arguments[_key];
+		}
+
+		var entities = {};
+		keys.forEach(function (key, index) {
+			entities[key] = args[index];
+		});
+
+		return entities;
+	});
+};
+
 exports.deepCompareUpdateEntities = deepCompareUpdateEntities;
 exports.deepCompareMergeEntities = deepCompareMergeEntities;
 exports.stripDeepCompare = stripDeepCompare;
@@ -173,3 +247,5 @@ exports.resetEntities = resetEntities;
 exports.removeObjectInArraySlice = removeObjectInArraySlice;
 exports.replaceObjectInArraySlice = replaceObjectInArraySlice;
 exports.removeEntities = removeEntities;
+exports.getSchemaRelations = getSchemaRelations;
+exports.buildEntitySchema = buildEntitySchema;

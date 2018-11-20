@@ -1,3 +1,7 @@
+import isEqual from 'lodash/isEqual';
+import { schema } from 'normalizr';
+import { createSelector } from 'reselect';
+
 import {
 	MERGE_ENTITIES,
 	REMOVE_ENTITIES,
@@ -5,8 +9,6 @@ import {
 	RESET_ENTITIES,
 	UPDATE_ENTITIES,
 } from './EntitiesActionTypes';
-
-import { isEqual } from 'underscore';
 
 /**
  * Strip entities with a deep compare
@@ -153,6 +155,63 @@ const deepCompareUpdateEntities = (entities) => (dispatch, getState) => {
 	}
 };
 
+/**
+ * Build a schema tree of a given entity schema. You can pass through a Entity or Array Schema
+ *
+ * @param entitySchema
+ * @param keys
+ * @param assessed
+ * @returns {Array}
+ */
+const getSchemaRelations = (entitySchema, keys = [], assessed = []) => {
+	if (entitySchema.constructor.name === 'ArraySchema' || entitySchema instanceof schema.Array) {
+		return getSchemaRelations(entitySchema.schema, keys, assessed);
+	} else if (entitySchema instanceof Array && entitySchema.length > 0) {
+		return getSchemaRelations(entitySchema[0], keys, assessed);
+	}
+
+	if (assessed.indexOf(entitySchema) !== -1) {
+		return keys;
+	}
+
+	if (entitySchema.schema) {
+		if (entitySchema._key && keys.indexOf(entitySchema._key) === -1) {
+			keys.push(entitySchema._key);
+			assessed.push(entitySchema);
+		}
+
+		Object.keys(entitySchema.schema).forEach((schemaKey) => {
+			keys = getSchemaRelations(entitySchema.schema[schemaKey], keys, assessed);
+		});
+	}
+
+	return keys;
+};
+
+/**
+ * Build a memoized function that extracts keys from an entities slice
+ *
+ * @param scheme
+ * @returns {*}
+ */
+const buildEntitySchema = (scheme) => {
+	const keys = getSchemaRelations(scheme);
+	const selectorFunctions = keys.reduce((acc, key) => {
+		acc.push((entities) => entities[key]);
+
+		return acc;
+	}, []);
+
+	return createSelector(selectorFunctions, (...args) => {
+		let entities = {};
+		keys.forEach((key, index) => {
+			entities[key] = args[index];
+		});
+
+		return entities;
+	});
+};
+
 export {
 	deepCompareUpdateEntities,
 	deepCompareMergeEntities,
@@ -165,4 +224,6 @@ export {
 	removeObjectInArraySlice,
 	replaceObjectInArraySlice,
 	removeEntities,
+	getSchemaRelations,
+	buildEntitySchema,
 };

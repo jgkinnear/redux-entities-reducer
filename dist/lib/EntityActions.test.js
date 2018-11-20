@@ -5,9 +5,31 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.STRIP_DEEP_COMPARE = undefined;
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _normalizr = require('normalizr');
+
 var _EntitiesActionTypes = require('./EntitiesActionTypes');
 
 var _EntityActions = require('./EntityActions');
+
+// Setup relationships
+var Book = new _normalizr.schema.Entity('books');
+var Library = new _normalizr.schema.Entity('libraries');
+var Author = new _normalizr.schema.Entity('authors');
+
+Book.define({
+	library: Library,
+	authors: Author
+});
+
+Library.define({
+	books: [Book]
+});
+
+Author.define({
+	books: [Book]
+});
 
 var STRIP_DEEP_COMPARE = exports.STRIP_DEEP_COMPARE = {
 	//	CASES
@@ -344,5 +366,87 @@ describe('replaceObjectInArraySlice()', function () {
 		}];
 
 		expect((0, _EntityActions.replaceObjectInArraySlice)(replace, obj)).toEqual(results);
+	});
+});
+
+describe('relationshipSelectorHelpers::getSchemaRelations', function () {
+	it('should build a tree with all relationship keys', function () {
+		var result = (0, _EntityActions.getSchemaRelations)(Book);
+		expect(result).toEqual(expect.arrayContaining(['authors', 'books', 'libraries']));
+		expect(result.length).toBe(3);
+	});
+});
+
+describe('relationshipSelectorHelpers::buildEntitySchema', function () {
+
+	it('should build a memoized function', function () {
+		expect(_typeof((0, _EntityActions.buildEntitySchema)(Book))).toBe('function');
+	});
+
+	it('should extract the correct key and value pairs from a entity tree when the result of the function is called', function () {
+
+		var getBookEntities = (0, _EntityActions.buildEntitySchema)(Book);
+		var entities = {
+			books: {},
+			people: {},
+			authors: {},
+			libraries: {}
+		};
+
+		var result = getBookEntities(entities);
+		expect(result).toMatchObject({
+			books: {},
+			authors: {},
+			libraries: {}
+		});
+	});
+
+	it('should memoize the result until values in the entity have changed', function () {
+
+		var getBookEntities = (0, _EntityActions.buildEntitySchema)(Book);
+		var entities = {
+			people: {
+				1: {}
+			},
+			books: {
+				1: {
+					author: 1,
+					library: 1
+				}
+			},
+			authors: {
+				1: {
+					books: [1]
+				}
+			},
+			libraries: {
+				1: {
+					books: [1]
+				}
+			}
+		};
+
+		var result1 = getBookEntities(entities);
+		var result2 = getBookEntities(entities);
+		expect(result1).toEqual(result2);
+
+		// Change people, which should still stay the same
+		entities.people = {};
+		var result3 = getBookEntities(entities);
+		expect(result1).toEqual(result3);
+
+		// Change the entities object, but keep the values of the relationship keys the same
+		entities = {
+			authors: entities.authors,
+			books: entities.books,
+			libraries: entities.libraries
+		};
+		var result4 = getBookEntities(entities);
+		expect(result1 === result4).toBe(true);
+
+		// Change authors and the results should no longer be the same
+		entities = {};
+		var result5 = getBookEntities(entities);
+		expect(result1 === result5).toBe(false);
 	});
 });

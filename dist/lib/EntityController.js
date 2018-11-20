@@ -73,7 +73,7 @@ var EntitiesController = function () {
 			var reducers = {};
 
 			Object.keys(_this.entities).forEach(function (entityKey) {
-				var entity = _this.entities[entityKey];
+				var entity = _this.getEntity(entityKey);
 				reducers[entity.key] = entity.reducer();
 			});
 
@@ -103,8 +103,10 @@ var EntitiesController = function () {
 			var entities = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 			var filters = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
 
-			var keys = Array.isArray(filters) ? filters : Object.keys(entities[key]);
-			return (0, _normalizr.denormalize)(keys, [_this.getSchema(key)], entities);
+			var schemaEntities = _this.getEntity(key).entitySchema(entities); // Only return the related entities
+			var keys = Array.isArray(filters) ? filters : Object.keys(schemaEntities[key]);
+
+			return (0, _normalizr.denormalize)(keys, [_this.getSchema(key)], schemaEntities);
 		};
 
 		this.init = function () {
@@ -118,6 +120,10 @@ var EntitiesController = function () {
 			Object.keys(_this._schemas).forEach(function (key) {
 				return _this.initRelations(_this.getSchema(key));
 			});
+			Object.keys(_this.entities).forEach(function (key) {
+				return _this.getEntity(key).generateEntitySchema();
+			});
+
 			_this.isInitialized = true;
 			return _this;
 		};

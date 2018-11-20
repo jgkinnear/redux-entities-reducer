@@ -1,3 +1,5 @@
+import isEqual from 'lodash/isEqual';
+
 import {
 	MERGE_ENTITIES,
 	REMOVE_ENTITIES,
@@ -38,6 +40,7 @@ const merge = (state = {}, entityKey, entities = {}, relations = []) => {
 		const originalEntity = state[entityKey][entityId] || actionEntity; // Entity in state
 
 		// If the old entities requested_at is after the new action entity, then don't use the action entity
+		// TODO: Make this entity defined. Will require this function having knowledge of an Entity or EntityController instance though.
 		if (isEntityOld(actionEntity, originalEntity)) {
 			return acc;
 		}
@@ -61,6 +64,12 @@ const merge = (state = {}, entityKey, entities = {}, relations = []) => {
 
 		return acc;
 	}, {});
+
+	// Compare if there are differences between the existing and the new entities to be merged in
+	if (isEqual(state[entityKey], mergedEntities)) {
+		// If there are no differences, return what we have so that we don't need to update state with a new entities object
+		return state;
+	}
 
 	// Return our entities with our merged in entries
 	return {
@@ -328,7 +337,7 @@ const entity = (
 			/**
 			 * Merge
 			 *
-			 * Merges the given entities with the current set. This utlises the passed in relation keys and will concat where required
+			 * Merges the given entities with the current set. This utilises the passed in relation keys and will concat where required
 			 */
 			case MERGE:
 				return merge(state, action.entityKey, action.entities, relations);

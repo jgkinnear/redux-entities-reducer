@@ -12,6 +12,8 @@ var _EntityReducer2 = _interopRequireDefault(_EntityReducer);
 
 var _EntitiesActionTypes = require('./EntitiesActionTypes');
 
+var _EntityActions = require('./EntityActions');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -31,7 +33,12 @@ var Entity = function () {
 
 
 	/**
-  * The Entity Controller to provide context for the Entity
+  * The relationship definitions
+  */
+
+	/**
+  * The Key in which the entity is stored under. This is the key within the redux store, as well the key for
+  * relationship references
   */
 	function Entity() {
 		var _this = this;
@@ -43,8 +50,17 @@ var Entity = function () {
 		this.key = undefined;
 		this.context = undefined;
 		this.relationships = undefined;
+		this.entitySchema = undefined;
 		this.processStrategy = undefined;
 		this.types = [_EntitiesActionTypes.MERGE_ENTITIES, _EntitiesActionTypes.REMOVE_ENTITIES, _EntitiesActionTypes.REPLACE_ENTITIES, _EntitiesActionTypes.RESET_ENTITIES, _EntitiesActionTypes.UPDATE_ENTITIES];
+
+		this.generateEntitySchema = function () {
+			_this.entitySchema = (0, _EntityActions.buildEntitySchema)(_this.getSchema());
+		};
+
+		this.getSchema = function () {
+			return _this.context.getSchema(_this.key);
+		};
 
 		this.setContext = function (context) {
 			_this.context = context;
@@ -79,6 +95,7 @@ var Entity = function () {
 		};
 
 		this.reducer = this.reducer.bind(this);
+
 		var copyProps = ['context', 'key', 'relationships', 'processStrategy', 'reducer'];
 		copyProps.forEach(function (prop) {
 			if (options[prop] !== undefined) {
@@ -88,9 +105,7 @@ var Entity = function () {
 	}
 
 	/**
-  * Set the context for an instance.
-  *
-  * @param context
+  * Generate the schema for the entity based on it's relationships
   */
 
 
@@ -103,12 +118,27 @@ var Entity = function () {
 
 
 	/**
-  * The relationship definitions
+  * Function to return the schema for the entity based on the provided entities
   */
 
+
 	/**
-  * The Key in which the entity is stored under. This is the key within the redux store, as well the key for
-  * relationship references
+  * The Entity Controller to provide context for the Entity
+  */
+
+
+	/**
+  * Get the registered normalizr schema
+  *
+  * @param key
+  * @returns {*}
+  */
+
+
+	/**
+  * Set the context for an instance.
+  *
+  * @param context
   */
 
 

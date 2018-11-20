@@ -593,6 +593,36 @@ describe('entity::merge', function () {
 			}
 		});
 	});
+
+	it('Should return exact same reference when merging exact same struct', function () {
+		var mergeResult = (0, _EntityReducer.merge)(stateWithRelationships, 'myEntity', {
+			1: { id: 1, relation_one: [2, 3, 4], relation_two: [1, 3], relation_three: [] },
+			2: { id: 2, relation_one: [1, 2, 3], relation_two: [2, 3, 4, 5], relation_three: [8, 14] },
+			3: {
+				id: 3,
+				relation_two: [5, 6],
+				relation_three: [1, 2, 3],
+				relation_four: [4, 5, 6],
+				relation_five: [4, 5, 6]
+			},
+			4: { id: 2, value: false, newKey: 'test', requested_at: 20 }
+		}, ['relation_one', 'relation_two', 'relation_three']);
+
+		var mergeResult2 = (0, _EntityReducer.merge)(mergeResult, 'myEntity', {
+			1: { id: 1, relation_one: [2, 3, 4], relation_two: [1, 3], relation_three: [] },
+			2: { id: 2, relation_one: [1, 2, 3], relation_two: [2, 3, 4, 5], relation_three: [8, 14] },
+			3: {
+				id: 3,
+				relation_two: [5, 6],
+				relation_three: [1, 2, 3],
+				relation_four: [4, 5, 6],
+				relation_five: [4, 5, 6]
+			},
+			4: { id: 2, value: false, newKey: 'test', requested_at: 20 }
+		}, ['relation_one', 'relation_two', 'relation_three']);
+
+		expect(mergeResult).toBe(mergeResult2);
+	});
 });
 
 describe('entity::updateProperty', function () {

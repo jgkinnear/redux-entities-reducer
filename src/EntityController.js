@@ -1,4 +1,5 @@
 import { schema, denormalize, normalize } from 'normalizr';
+
 import Entity from './Entity';
 import { createReducer } from './index';
 
@@ -123,7 +124,7 @@ export default class EntitiesController {
 		const reducers = {};
 
 		Object.keys(this.entities).forEach((entityKey) => {
-			const entity = this.entities[entityKey];
+			const entity = this.getEntity(entityKey);
 			reducers[entity.key] = entity.reducer();
 		});
 
@@ -169,8 +170,10 @@ export default class EntitiesController {
 	 * @param filters
 	 */
 	denormalize = (key, entities = {}, filters = null) => {
-		const keys = Array.isArray(filters) ? filters : Object.keys(entities[key]);
-		return denormalize(keys, [this.getSchema(key)], entities);
+		const schemaEntities = this.getEntity(key).entitySchema(entities); // Only return the related entities
+		const keys = Array.isArray(filters) ? filters : Object.keys(schemaEntities[key]);
+
+		return denormalize(keys, [this.getSchema(key)], schemaEntities);
 	};
 
 	/**
@@ -183,6 +186,8 @@ export default class EntitiesController {
 
 		Object.keys(this._entityConfig).forEach((key) => this.initEntity(this._entityConfig[key]));
 		Object.keys(this._schemas).forEach((key) => this.initRelations(this.getSchema(key)));
+		Object.keys(this.entities).forEach((key) => this.getEntity(key).generateEntitySchema());
+
 		this.isInitialized = true;
 		return this;
 	};

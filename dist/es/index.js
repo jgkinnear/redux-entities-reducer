@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.RESET_ENTITIES = exports.REMOVE_ENTITIES = exports.REPLACE_ENTITIES = exports.UPDATE_ENTITIES = exports.MERGE_ENTITIES = exports.removeEntities = exports.resetEntities = exports.replaceEntities = exports.mergeEntities = exports.updateEntities = exports.Entity = exports.hasMany = exports.hasOne = exports.createEntityReducer = exports.createReducer = exports.createController = undefined;
+exports.RESET_ENTITIES = exports.REMOVE_ENTITIES = exports.REPLACE_ENTITIES = exports.UPDATE_ENTITIES = exports.MERGE_ENTITIES = exports.removeEntities = exports.resetEntities = exports.replaceEntities = exports.mergeEntities = exports.updateEntities = exports.deepCompareMergeEntities = exports.deepCompareUpdateEntities = exports.Entity = exports.hasMany = exports.hasOne = exports.createEntityReducer = exports.createReducer = exports.createController = undefined;
 
 var _EntitiesReducer = require('./EntitiesReducer');
 
@@ -69,6 +69,8 @@ exports.createEntityReducer = createEntityReducer;
 exports.hasOne = _EntityController.hasOne;
 exports.hasMany = _EntityController.hasMany;
 exports.Entity = _Entity2.default;
+exports.deepCompareUpdateEntities = _EntityActions.deepCompareUpdateEntities;
+exports.deepCompareMergeEntities = _EntityActions.deepCompareMergeEntities;
 exports.updateEntities = _EntityActions.updateEntities;
 exports.mergeEntities = _EntityActions.mergeEntities;
 exports.replaceEntities = _EntityActions.replaceEntities;

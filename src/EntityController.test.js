@@ -5,24 +5,26 @@ import { schema } from 'normalizr';
 describe('buildEntity', () => {
 	let Entities;
 
-	let book1 = {
-		id: 1,
-		name: 'Book1',
-	};
-
-	let book2 = {
-		id: 2,
-		name: 'Book2',
-	};
-
-	let author1 = {
+	const author1 = {
 		id: 1,
 		name: 'Author1',
 	};
 
-	let author2 = {
+	const author2 = {
 		id: 2,
 		name: 'Author2',
+	};
+
+	const book1 = {
+		id: 1,
+		name: 'Book1',
+		author: author1,
+	};
+
+	const book2 = {
+		id: 2,
+		name: 'Book2',
+		author: author2,
 	};
 
 	beforeEach(() => {

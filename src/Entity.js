@@ -6,6 +6,7 @@ import {
 	RESET_ENTITIES,
 	UPDATE_ENTITIES,
 } from './EntitiesActionTypes';
+import { buildEntitySchema } from './EntityActions';
 
 export default class Entity {
 	/**
@@ -23,6 +24,11 @@ export default class Entity {
 	 * The relationship definitions
 	 */
 	relationships = undefined;
+
+	/**
+	 * Function to return the schema for the entity based on the provided entities
+	 */
+	entitySchema = undefined;
 
 	/**
 	 * A function to process incoming entities
@@ -44,6 +50,7 @@ export default class Entity {
 	 */
 	constructor(options = {}) {
 		this.reducer = this.reducer.bind(this);
+
 		const copyProps = ['context', 'key', 'relationships', 'processStrategy', 'reducer'];
 		copyProps.forEach((prop) => {
 			if (options[prop] !== undefined) {
@@ -51,6 +58,23 @@ export default class Entity {
 			}
 		});
 	}
+
+	/**
+	 * Generate the schema for the entity based on it's relationships
+	 */
+	generateEntitySchema = () => {
+		this.entitySchema = buildEntitySchema(this.getSchema());
+	};
+
+	/**
+	 * Get the registered normalizr schema
+	 *
+	 * @param key
+	 * @returns {*}
+	 */
+	getSchema = () => {
+		return this.context.getSchema(this.key);
+	};
 
 	/**
 	 * Set the context for an instance.
